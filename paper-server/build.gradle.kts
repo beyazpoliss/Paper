@@ -1,6 +1,7 @@
 import io.papermc.fill.model.BuildChannel
 import io.papermc.paperweight.attribute.DevBundleOutput
 import io.papermc.paperweight.util.*
+import java.io.File
 import java.time.Instant
 
 plugins {
@@ -217,7 +218,29 @@ tasks.jar {
     }
 }
 
-// Compile tests with -parameters for better junit parameterized test names
+val deployPaperJarEnabled = providers.gradleProperty("deployPaperJar")
+    .map { it.toBoolean() }
+    .orElse(false)
+val deployPaperJarDir = providers.gradleProperty("deployPaperJarDir")
+    .orElse("C:/chunk-royal/paper-server")
+
+val deployPaperJar by tasks.registering(Copy::class) {
+    val outputJar = tasks.createMojmapPaperclipJar.flatMap { it.outputZip }
+    from(outputJar)
+    into(deployPaperJarDir.map { dir -> File(dir) })
+    rename { "paper.jar" }
+    enabled = deployPaperJarEnabled.get()
+}
+
+tasks.createMojmapPaperclipJar {
+    finalizedBy(deployPaperJar)
+}
+
+tasks.named("build") {
+    finalizedBy(deployPaperJar)
+}
+
+// Compile tests with -parameters for better junit parameterized test names     
 tasks.compileTestJava {
     options.compilerArgs.add("-parameters")
 }

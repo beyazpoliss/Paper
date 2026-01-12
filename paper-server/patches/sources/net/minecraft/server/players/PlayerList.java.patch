@@ -37,10 +37,10 @@
 +        // CraftBukkit end
          this.server = server;
          this.registries = registries;
-         this.playerIo = playerIo;
-@@ -141,23 +_,19 @@
-         this.ipBans = new IpBanList(IPBANLIST_FILE, notificationService);
-     }
+        this.playerIo = playerIo;
+@@ -141,23 +_,29 @@
+        this.ipBans = new IpBanList(IPBANLIST_FILE, notificationService);      
+    }
  
 +    abstract public void loadAndSaveFiles(); // Paper - fix converting txt to json file; moved from DedicatedPlayerList constructor
 +
@@ -54,6 +54,17 @@
 +        if (player.lastKnownName != null) { string = player.lastKnownName; player.lastKnownName = null; } // CraftBukkit - Better rename detection
          userNameToIdResolver.add(nameAndId);
          ServerLevel serverLevel = player.level();
++        ServerLevel spawnLevel = this.server.overworld();
++        if (spawnLevel != null) {
++            if (serverLevel != spawnLevel) {
++                player.spawnIn(spawnLevel);
++                serverLevel = spawnLevel;
++            }
++            LevelData.RespawnData respawnData = spawnLevel.getLevelData().getRespawnData();
++            BlockPos spawnPos = respawnData.pos();
++            BlockPos safeSpawnPos = spawnLevel.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, spawnPos).above();
++            player.snapTo(safeSpawnPos.getX() + 0.5D, safeSpawnPos.getY(), safeSpawnPos.getZ() + 0.5D, respawnData.yaw(), respawnData.pitch());
++        }
          String loggableAddress = connection.getLoggableAddress(this.server.logIPs());
 -        LOGGER.info(
 -            "{}[{}] logged in with entity id {} at ({}, {}, {})",

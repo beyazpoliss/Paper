@@ -205,15 +205,17 @@
              this.services.nameToIdCache().resolveOfflineUsers(!this.usesAuthentication());
              LOGGER.info("Preparing level \"{}\"", this.getLevelIdName());
 -            this.loadLevel();
-+            this.loadLevel(this.storageSource.getLevelId()); // CraftBukkit
++            LOGGER.info("Skipping vanilla world load for level \"{}\"; external world system will create worlds.", this.getLevelIdName());
              long l = Util.getNanos() - nanos;
              String string3 = String.format(Locale.ROOT, "%.3fs", l / 1.0E9);
 -            LOGGER.info("Done ({})! For help, type \"help\"", string3);
-+            LOGGER.info("Done preparing level \"{}\" ({})", this.getLevelIdName(), string3); // Paper - Improve startup message, add total time
++            LOGGER.info("Done preparing server (no default worlds) ({})", string3);
 +            this.initPostWorld(); // Paper - don't include plugins in world preparation time
              if (properties.announcePlayerAchievements != null) {
 -                this.worldData.getGameRules().set(GameRules.SHOW_ADVANCEMENT_MESSAGES, properties.announcePlayerAchievements, this);
-+                this.worldData.getGameRules().set(GameRules.SHOW_ADVANCEMENT_MESSAGES, properties.announcePlayerAchievements, this.overworld()); // Paper - per-world game rules
++                if (this.overworld() != null) {
++                    this.worldData.getGameRules().set(GameRules.SHOW_ADVANCEMENT_MESSAGES, properties.announcePlayerAchievements, this.overworld()); // Paper - per-world game rules
++                }
              }
  
              if (properties.enableQuery) {
@@ -417,3 +419,4 @@
 +    }
 +    // CraftBukkit end
  }
+

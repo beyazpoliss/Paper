@@ -67,6 +67,8 @@ To compile Paper, you need JDK 21 and an internet connection.
 
 Clone this repo, run `./gradlew applyPatches`, then `./gradlew createMojmapBundlerJar` from your terminal. You can find the compiled jar in the `paper-server/build/libs` directory.
 
+Local build note: to copy the Paperclip jar to `C:/chunk-royal/paper-server/paper.jar`, run `./gradlew build -PdeployPaperJar=true`. You can override the destination with `-PdeployPaperJarDir=...`.
+
 To get a full list of tasks, run `./gradlew tasks`.
 
 How To (Pull Request)

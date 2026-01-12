@@ -368,6 +368,18 @@
 +        this.addLevel(serverLevel);
 +        this.initWorld(serverLevel, serverLevelData, worldOptions);
 +    }
++    // Paper start - allow external world systems to initialize the primary world
++    public void initPrimaryWorld(ServerLevel serverLevel, net.minecraft.world.level.storage.PrimaryLevelData serverLevelData) {
++        this.worldData = serverLevelData;
++        if (this instanceof net.minecraft.server.dedicated.DedicatedServer dedicatedServer) {
++            this.worldData.setGameType(dedicatedServer.getProperties().gameMode.get());
++        }
++        DimensionDataStorage dataStorage = serverLevel.getDataStorage();
++        this.readScoreboard(dataStorage);
++        this.commandStorage = new CommandStorage(dataStorage);
++        this.server.scoreboardManager = new org.bukkit.craftbukkit.scoreboard.CraftScoreboardManager(this, serverLevel.getScoreboard());
++    }
++    // Paper end - allow external world systems to initialize the primary world
 +    public void initWorld(ServerLevel serverLevel, net.minecraft.world.level.storage.PrimaryLevelData serverLevelData, WorldOptions worldOptions) {
 +        final boolean isDebugWorld = this.worldData.isDebugWorld();
 +        if (serverLevel.generator != null) {

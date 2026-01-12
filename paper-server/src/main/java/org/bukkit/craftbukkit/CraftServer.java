@@ -1173,7 +1173,7 @@ public final class CraftServer implements Server {
 
     @Override
     public World createWorld(WorldCreator creator) {
-        Preconditions.checkState(this.console.getAllLevels().iterator().hasNext(), "Cannot create additional worlds on STARTUP");
+        boolean isPrimaryWorld = !this.console.getAllLevels().iterator().hasNext();
         //Preconditions.checkState(!this.console.isIteratingOverLevels, "Cannot create a world while worlds are being ticked"); // Paper - Cat - Temp disable. We'll see how this goes.
         Preconditions.checkArgument(creator != null, "WorldCreator cannot be null");
 
@@ -1277,7 +1277,9 @@ public final class CraftServer implements Server {
 
         ResourceKey<net.minecraft.world.level.Level> dimensionKey;
         String levelName = this.getServer().getProperties().levelName;
-        if (name.equals(levelName + "_nether")) {
+        if (isPrimaryWorld && creator.environment() == Environment.NORMAL) {
+            dimensionKey = net.minecraft.world.level.Level.OVERWORLD;
+        } else if (name.equals(levelName + "_nether")) {
             dimensionKey = net.minecraft.world.level.Level.NETHER;
         } else if (name.equals(levelName + "_the_end")) {
             dimensionKey = net.minecraft.world.level.Level.END;
@@ -1296,10 +1298,14 @@ public final class CraftServer implements Server {
             i,
             creator.environment() == Environment.NORMAL ? list : ImmutableList.of(),
             true,
-            this.console.overworld().getRandomSequences(),
+            this.console.overworld() == null ? null : this.console.overworld().getRandomSequences(),
             creator.environment(),
             chunkGenerator, biomeProvider
         );
+
+        if (isPrimaryWorld && creator.environment() == Environment.NORMAL) {
+            this.console.initPrimaryWorld(serverLevel, primaryLevelData);
+        }
 
         if (!(this.worlds.containsKey(name.toLowerCase(Locale.ROOT)))) {
             return null;
