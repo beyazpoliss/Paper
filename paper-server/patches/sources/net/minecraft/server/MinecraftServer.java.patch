@@ -375,8 +375,9 @@
 +            this.worldData.setGameType(dedicatedServer.getProperties().gameMode.get());
 +        }
 +        DimensionDataStorage dataStorage = serverLevel.getDataStorage();
-+        this.readScoreboard(dataStorage);
++        this.scoreboard.load(dataStorage.computeIfAbsent(ScoreboardSaveData.TYPE).getData());
 +        this.commandStorage = new CommandStorage(dataStorage);
++        this.stopwatches = dataStorage.computeIfAbsent(Stopwatches.TYPE);
 +        this.server.scoreboardManager = new org.bukkit.craftbukkit.scoreboard.CraftScoreboardManager(this, serverLevel.getScoreboard());
 +    }
 +    // Paper end - allow external world systems to initialize the primary world

@@ -37,10 +37,10 @@
 +        // CraftBukkit end
          this.server = server;
          this.registries = registries;
-        this.playerIo = playerIo;
+         this.playerIo = playerIo;
 @@ -141,23 +_,29 @@
-        this.ipBans = new IpBanList(IPBANLIST_FILE, notificationService);      
-    }
+         this.ipBans = new IpBanList(IPBANLIST_FILE, notificationService);
+     }
  
 +    abstract public void loadAndSaveFiles(); // Paper - fix converting txt to json file; moved from DedicatedPlayerList constructor
 +
